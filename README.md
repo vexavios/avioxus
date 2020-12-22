@@ -1,0 +1,2 @@
+# vexibot
+personal discord bot
