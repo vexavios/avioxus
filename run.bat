@@ -1,0 +1,2 @@
+nodemon vexibot.js
+PAUSE
