@@ -21,70 +21,70 @@ client.on("ready", () => {
     client.user.setPresence({ activity: { name: "my master Vexilon.", type: "WATCHING" }, status: "dnd" });
 
     // check for new ukikipedia news posts every half hour
-    // setInterval(function() {
-    //     axios.get("https://news.ukikipedia.net/")
-    //         .then(response =>  {
-    //             if (response.status === 200) {
-    //                 let vex = client.users.cache.find(u => u.id === config.creatorid);
-    //                 let $ = cheerio.load(response.data);
+    setInterval(function() {
+        axios.get("https://news.ukikipedia.net/")
+            .then(response =>  {
+                if (response.status === 200) {
+                    let vex = client.users.cache.find(u => u.id === config.creatorid);
+                    let $ = cheerio.load(response.data);
 
-    //                 let postLink = $("h2.entry-title", "header.entry-header").children().first().attr("href");
+                    let postLink = $("h2.entry-title", "header.entry-header").children().first().attr("href");
 
-    //                 fs.readFile("info.json", (err, data) => {
-    //                     if (err) throw err;
+                    fs.readFile("info.json", (err, data) => {
+                        if (err) throw err;
                         
-    //                     let current = JSON.parse(data);
+                        let current = JSON.parse(data);
 
-    //                     if (current.ukikilink !== postLink) {
-    //                         current.ukikilink = postLink;
+                        if (current.ukikilink !== postLink) {
+                            current.ukikilink = postLink;
 
-    //                         axios.get(current.ukikilink)
-    //                             .then(response => {
-    //                                 if (response.status === 200) {
-    //                                     $ = cheerio.load(response.data);
+                            axios.get(current.ukikilink)
+                                .then(response => {
+                                    if (response.status === 200) {
+                                        $ = cheerio.load(response.data);
 
-    //                                     let postTitle = $("h1.entry-title", "header.entry-header").text();
-    //                                     let postSummary = "";
+                                        let postTitle = $("h1.entry-title", "header.entry-header").text();
+                                        let postSummary = "";
 
-    //                                     $("p", "div.entry-content").each(function() {
-    //                                         postSummary += $(this).text() + "\n\n";
-    //                                     });
+                                        $("p", "div.entry-content").each(function() {
+                                            postSummary += $(this).text() + "\n\n";
+                                        });
 
-    //                                     if (postSummary.length > 1000) postSummary = postSummary.substr(0, 1000) + "...";
+                                        if (postSummary.length > 1000) postSummary = postSummary.substr(0, 1000) + "...";
 
-    //                                     console.log("Retrieved new Ukikipedia news post and sent it!");
-    //                                     vex.send({ embed: {
-    //                                                 title: postTitle,
-    //                                                 description: postSummary,
-    //                                                 color: 16727614,
-    //                                                 timestamp: new Date(),
-    //                                                 footer: {
-    //                                                     text: "Ukikipedia News"
-    //                                                 },
-    //                                                 thumbnail: {
-    //                                                     url: "https://cdn.discordapp.com/attachments/563511348185530378/742521221434048532/ukikipedia_logo.png"
-    //                                                 },
-    //                                                 fields: [
-    //                                                     {
-    //                                                         name: "Link to News Post",
-    //                                                         value: current.ukikilink
-    //                                                     }
-    //                                                 ]
-    //                                             }}).then(msg => {
-    //                                                 fs.writeFile("info.json", JSON.stringify(current), err => {
-    //                                                     if (err) throw err;
-    //                                                 });
-    //                                             }).catch(err => {
-    //                                                 console.error(`An error occurred while trying to send a Ukikipedia news post:\n${err}`);
-    //                                                 return vex.send("**An error occurred while trying to send a Ukikipedia news post:**```" + err + "```");
-    //                                             });
-    //                                 }
-    //                             }).catch(error => console.error(error));
-    //                     }
-    //                 });
-    //             }
-    //         }).catch(error => console.error(error));
-    // }, 1.8e+6);
+                                        console.log("Retrieved new Ukikipedia news post and sent it!");
+                                        vex.send({ embed: {
+                                                    title: postTitle,
+                                                    description: postSummary,
+                                                    color: 16727614,
+                                                    timestamp: new Date(),
+                                                    footer: {
+                                                        text: "Ukikipedia News"
+                                                    },
+                                                    thumbnail: {
+                                                        url: "https://cdn.discordapp.com/attachments/563511348185530378/742521221434048532/ukikipedia_logo.png"
+                                                    },
+                                                    fields: [
+                                                        {
+                                                            name: "Link to News Post",
+                                                            value: current.ukikilink
+                                                        }
+                                                    ]
+                                                }}).then(msg => {
+                                                    fs.writeFile("info.json", JSON.stringify(current), err => {
+                                                        if (err) throw err;
+                                                    });
+                                                }).catch(err => {
+                                                    console.error(`An error occurred while trying to send a Ukikipedia news post:\n${err}`);
+                                                    return vex.send("**An error occurred while trying to send a Ukikipedia news post:**```" + err + "```");
+                                                });
+                                    }
+                                }).catch(error => console.error(error));
+                        }
+                    });
+                }
+            }).catch(error => console.error(error));
+    }, 1.8e+6);
 });
 
 // error event
