@@ -1,0 +1,27 @@
+{
+  "name": "vexibot",
+  "version": "1.0.0",
+  "description": "my personal discord bot",
+  "main": "vexibot.js",
+  "scripts": {
+    "test": "node vexibot.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vexilon/vexibot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Vexilon/vexibot/issues"
+  },
+  "homepage": "https://github.com/Vexilon/vexibot#readme",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "cheerio": "^1.0.0-rc.5",
+    "discord.js": "^12.5.1",
+    "generate-image": "^1.0.1",
+    "svg2img": "^0.9.1",
+    "wtf_wikipedia": "^8.5.1"
+  }
+}
