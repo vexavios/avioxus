@@ -12,6 +12,7 @@ export interface svg2imgOptions {
   preserveAspectRatio?: boolean | string;
   format?: Format;
   quality?: number;
+  compressionLevel?: number;
 }
 
 declare function svg2img(svg: string, options: svg2imgOptions, callback: Callback): void;
