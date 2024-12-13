@@ -1,27 +1,24 @@
 {
-  "name": "vexibot",
+  "name": "avioxus",
   "version": "1.0.0",
   "description": "my personal discord bot",
-  "main": "vexibot.js",
+  "main": "index.js",
   "scripts": {
-    "test": "node vexibot.js"
+    "test": "nodemon index.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Vexilon/vexibot.git"
+    "url": "git+https://github.com/vexavios/avioxus.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Vexilon/vexibot/issues"
+    "url": "https://github.com/vexavios/avioxus/issues"
   },
-  "homepage": "https://github.com/Vexilon/vexibot#readme",
+  "homepage": "https://github.com/vexavios/avioxus#readme",
   "dependencies": {
-    "axios": "^0.21.1",
-    "cheerio": "^1.0.0-rc.5",
-    "discord.js": "^12.5.1",
-    "generate-image": "^1.0.1",
-    "svg2img": "^0.9.1",
-    "wtf_wikipedia": "^8.5.1"
+    "axios": "^1.7.9",
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.7"
   }
 }
