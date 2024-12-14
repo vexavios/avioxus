@@ -2,9 +2,10 @@
   "name": "avioxus",
   "version": "1.0.0",
   "description": "my personal discord bot",
-  "main": "index.js",
+  "main": "src/index.js",
+  "type": "module",
   "scripts": {
-    "test": "nodemon index.js"
+    "start": "nodemon src/index.js"
   },
   "repository": {
     "type": "git",
