@@ -61,5 +61,5 @@ client.on("interactionCreate", async (interaction) => {
 client.login(process.env.DISCORD_TOKEN);
 
 // Setup server to listen on port
-const PORT = process.env.PORT || 8081;
+const PORT = 8081;
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}.`));
