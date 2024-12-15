@@ -134,7 +134,7 @@ export async function getCurrentlyFeaturedLSSLevels(game) {
   try {
     const allFeaturedLevels = [];
     const maxPages = 2;
-    const currentPage = 1;
+    let currentPage = 1;
 
     // API calls for all pages
     while (currentPage <= maxPages) {
