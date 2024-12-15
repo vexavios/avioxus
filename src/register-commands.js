@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import { REST, Routes, ApplicationCommandOptionType } from "discord.js";
+import { Commands } from "./constants.js";
 
 dotenv.config();
 
@@ -8,33 +9,33 @@ dotenv.config();
 // Config for all slash commands
 const commands = [
   {
-    name: "ping",
+    name: Commands.PING,
     description: "Ping the bot to ensure that it's working correctly.",
   },
   {
-    name: "featured",
+    name: Commands.FEATURED.NAME,
     description: "Gets all current featured levels from LSS.",
     options: [
       {
-        name: "game",
+        name: Commands.FEATURED.subCommands.GAME,
         description: "An optional game to filter by.",
-        type: ApplicationCommandOptionType.String,
+        type: ApplicationCommandOptionType.Number,
         choices: [
           {
             name: "SMC",
-            value: "SMC",
+            value: 0,
           },
           {
             name: "YFS",
-            value: "YFS",
+            value: 1,
           },
           {
             name: "SM127",
-            value: "SM127",
+            value: 2,
           },
           {
             name: "MB64",
-            value: "MB64",
+            value: 4,
           },
         ],
         required: false,

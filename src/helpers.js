@@ -129,6 +129,49 @@ async function getWordOfTheDay() {
   }
 }
 
+// Get currently featured levels from LSS (with optional game to filter by)
+export async function getCurrentlyFeaturedLSSLevels(game) {
+  try {
+    const allFeaturedLevels = [];
+    const maxPages = 2;
+    const currentPage = 1;
+
+    // API calls for all pages
+    while (currentPage <= maxPages) {
+      const response = await axios.get(
+        `${APIs.LSS}/levels/featured/get?page=${currentPage}${
+          game !== -1 && `&game=${game}`
+        }`
+      );
+      const { levels } = response.data;
+
+      // Keep only currently featured levels
+      const featuredLevels = levels?.filter(
+        (level) => level.status === "Featured"
+      );
+      allFeaturedLevels.push(featuredLevels);
+
+      currentPage++;
+    }
+
+    // If no levels are found
+    if (allFeaturedLevels.length === 0)
+      return "There are currently no featured levels on LSS matching your query.";
+
+    // Construct response from all levels
+    let responseStr =
+      "__***Currently featured levels on LSS matching your query:***__\n\n\n";
+    for (const featuredLevel of allFeaturedLevels) {
+      responseStr += `[**${featuredLevel.name}**](<https://levelsharesquare.com/levels/${featuredLevel._id}>)\n\n`;
+    }
+
+    return responseStr;
+  } catch (error) {
+    console.error("Error fetching featured levels from LSS:", error);
+    return "Error fetching featured levels from LSS.";
+  }
+}
+
 // Split message into multiple parts if it exceeds the Discord character limit
 function splitMessage(text) {
   const result = [];

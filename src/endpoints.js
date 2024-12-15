@@ -1,13 +1,13 @@
 import express from "express";
 import { InteractionType } from "discord.js";
 import { verifyKeyMiddleware } from "discord-interactions";
-import { sendDailyPost } from "./helpers.js";
+import { getCurrentlyFeaturedLSSLevels, sendDailyPost } from "./helpers.js";
 import { isBotReady } from "./index.js";
 import { Commands } from "./constants.js";
 
 const router = express.Router();
 
-// Generic endpoint currently used for the daily post trigger
+// Generic endpoint currently used for the daily post trigger and app pinging
 router.get("/", async (req, res) => {
   // Check for custom trigger header from Cloud Scheduler
   const trigger = req.get("X-Daily-Post-Trigger");
@@ -37,7 +37,7 @@ router.get("/", async (req, res) => {
       return res.status(500).send("Failed to send daily message.");
     }
   }
-  // Default response for non-cron triggers (e.g., from slash command, manual, or other invocations)
+  // Default response for non-cron triggers (e.g., manual, or other invocations)
   else {
     res.status(200).send("Service is online. Awaiting further instructions.");
   }
@@ -49,14 +49,16 @@ router.post(
   express.raw({ type: "application/json" }),
   verifyKeyMiddleware(process.env.DISCORD_PUBLIC_KEY),
   async (req, res) => {
-    const interaction = req.body;
+    const interaction = JSON.parse(req.body);
 
     // Respond to Discord's ping for verification
     if (interaction.type === InteractionType.Ping) return res.json({ type: 1 });
 
-    // Handle Slash Command
+    // Handle Slash Commands
     if (interaction.type === InteractionType.ApplicationCommand) {
+      // Extract command and any subcommand(s)
       const commandName = interaction.data.name;
+      const options = interaction.data.options || [];
 
       // Format current timestamp
       const now = new Date();
@@ -77,11 +79,17 @@ router.post(
           });
         // Get featured levels from LSS
         case Commands.FEATURED.NAME:
-          const game = options.get(Commands.FEATURED.subCommands.GAME)?.value;
+          const game = options.find(
+            (option) => option.name === Commands.FEATURED.subCommands.GAME
+          )?.value;
+
+          // Get all levels
+          const responseStr = await getCurrentlyFeaturedLSSLevels(game ?? -1);
+
           return res.json({
             type: 4,
             data: {
-              content: "Under construction!",
+              content: responseStr,
             },
           });
         default:
