@@ -1,0 +1,33 @@
+steps:
+  # Step 1: Build the Docker image
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-t", "gcr.io/avioxus/avioxus-bot", "."]
+
+  # Step 2: Push the Docker image to Container Registry
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/avioxus/avioxus-bot"]
+
+  # Step 3: Deploy the updated image to Cloud Run
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: "gcloud"
+    args:
+      - "run"
+      - "deploy"
+      - "avioxus-bot"
+      - "--image"
+      - "gcr.io/avioxus/avioxus-bot"
+      - "--region"
+      - "us-central1"
+      - "--platform"
+      - "managed"
+      - "--allow-unauthenticated"
+
+# Define substitutions (optional, useful for dynamic builds)
+substitutions:
+  _REGION: "us-central1"
+
+# Timeout for the build process
+timeout: "1200s"
+
+# Specify the service account for Cloud Build
+serviceAccount: "avioxus-service-account@avioxus.iam.gserviceaccount.com"
