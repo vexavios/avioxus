@@ -51,6 +51,8 @@ router.post(
   async (req, res) => {
     const interaction = req.body;
 
+    console.log(interaction.type);
+
     // Respond to Discord's ping for verification
     if (interaction.type === InteractionType.Ping) return res.json({ type: 1 });
 
@@ -67,6 +69,8 @@ router.post(
       // Log usage of command
       console.log(`"/${commandName}" command used at ${nowIsoDate}.`);
 
+      console.log(commandName);
+
       // Handle all commands
       switch (commandName) {
         // Standard ping command
@@ -82,6 +86,9 @@ router.post(
           const game = options.find(
             (option) => option.name === Commands.FEATURED.subCommands.GAME
           )?.value;
+
+          console.log(game);
+          console.log(typeof game);
 
           // Get all levels
           const responseStr = await getCurrentlyFeaturedLSSLevels(game ?? -1);
