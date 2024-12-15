@@ -1,9 +1,9 @@
 import express from "express";
-import {
-  InteractionType,
-  InteractionResponseType,
-  verifyKeyMiddleware,
-} from "discord-interactions";
+// import {
+//   InteractionType,
+//   InteractionResponseType,
+//   verifyKeyMiddleware,
+// } from "discord-interactions";
 import { sendDailyPost } from "./helpers.js";
 import { isBotReady } from "./index.js";
 

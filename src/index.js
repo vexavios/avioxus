@@ -10,7 +10,7 @@ import { APIs, Commands } from "./constants.js";
 dotenv.config();
 const app = express();
 // Handle JSON data for appropriate endpoints
-app.use(express.json());
+// app.use(express.json());
 // Server routes
 app.use("/", routes);
 
