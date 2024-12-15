@@ -31,3 +31,7 @@ timeout: "1200s"
 
 # Specify the service account for Cloud Build
 serviceAccount: "avioxus-service-account@avioxus.iam.gserviceaccount.com"
+
+# Options for build
+options:
+  logging: CLOUD_LOGGING_ONLY
