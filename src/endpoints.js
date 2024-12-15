@@ -47,30 +47,30 @@ router.get("/", async (req, res) => {
 });
 
 // Discord Slash Command Handler
-router.post(
-  "/interactions",
-  verifyKeyMiddleware(process.env.DISCORD_PUBLIC_KEY),
-  (req, res) => {
-    const interaction = req.body;
+// router.post(
+//   "/interactions",
+//   verifyKeyMiddleware(process.env.DISCORD_PUBLIC_KEY),
+//   (req, res) => {
+//     const interaction = req.body;
 
-    // Handle Slash Command
-    if (
-      interaction.type === InteractionType.APPLICATION_COMMAND ||
-      interaction.type === InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE
-    ) {
-      console.log("Received slash command:", interaction.data.name);
+//     // Handle Slash Command
+//     if (
+//       interaction.type === InteractionType.APPLICATION_COMMAND ||
+//       interaction.type === InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE
+//     ) {
+//       console.log("Received slash command:", interaction.data.name);
 
-      // Respond to the slash command
-      return res.status(200).json({
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data: {
-          content: "Hello! The bot is online and ready to respond.",
-        },
-      });
-    }
+//       // Respond to the slash command
+//       return res.status(200).json({
+//         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+//         data: {
+//           content: "Hello! The bot is online and ready to respond.",
+//         },
+//       });
+//     }
 
-    res.status(400).send("Unhandled interaction type");
-  }
-);
+//     res.status(400).send("Unhandled interaction type");
+//   }
+// );
 
 export default router;
