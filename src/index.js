@@ -8,7 +8,7 @@ import routes from "./endpoints.js";
 dotenv.config();
 const app = express();
 // Middleware to parse JSON
-app.use(express.json());
+// app.use(express.json());
 // Server routes
 app.use("/", routes);
 
