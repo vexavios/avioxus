@@ -46,10 +46,10 @@ router.get("/", async (req, res) => {
 // Discord Slash Command Handler
 router.post(
   "/interactions",
-  express.raw({ type: "application/json" }),
+  // express.raw({ type: "application/json" }),
   verifyKeyMiddleware(process.env.DISCORD_PUBLIC_KEY),
   async (req, res) => {
-    const interaction = JSON.parse(req.body);
+    const interaction = req.body;
 
     // Respond to Discord's ping for verification
     if (interaction.type === InteractionType.Ping) return res.json({ type: 1 });
