@@ -7,6 +7,7 @@ export const APIs = {
   FUN_FACT: "https://uselessfacts.jsph.pl/api/v2/facts/today",
   WORD: "https://api.wordnik.com/v4/words.json/wordOfTheDay",
   LSS: "https://levelsharesquare.com/api/",
+  CLOUD_RUN: "https://avioxus-bot-755395428816.us-central1.run.app/",
 };
 
 // Configs for APIs
