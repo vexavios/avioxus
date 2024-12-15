@@ -54,7 +54,10 @@ router.post(
     const interaction = req.body;
 
     // Handle Slash Command
-    if (interaction.type === InteractionType.APPLICATION_COMMAND) {
+    if (
+      interaction.type === InteractionType.APPLICATION_COMMAND ||
+      interaction.type === InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE
+    ) {
       console.log("Received slash command:", interaction.data.name);
 
       // Respond to the slash command
