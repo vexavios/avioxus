@@ -134,40 +134,46 @@ export async function getCurrentlyFeaturedLSSLevels(game) {
   try {
     const allFeaturedLevels = [];
     const maxPages = 2;
-    let currentPage = 1;
 
-    // API calls for all pages
-    while (currentPage <= maxPages) {
-      const response = await axios.get(
-        `${APIs.LSS}/levels/featured/get?page=${currentPage}${
-          game !== -1 && `&game=${game}`
-        }`
-      );
+    // Loop through pages to fetch levels
+    for (let currentPage = 1; currentPage <= maxPages; currentPage++) {
+      const query =
+        game !== -1
+          ? `?page=${currentPage}&game=${game}`
+          : `?page=${currentPage}`;
+      const url = `${APIs.LSS}/levels/featured/get${query}`;
+
+      const response = await axios.get(url);
       const { levels } = response.data;
 
-      // Keep only currently featured levels
-      const featuredLevels = levels?.filter(
-        (level) => level.status === "Featured"
-      );
-      allFeaturedLevels.push(featuredLevels);
-
-      currentPage++;
+      if (levels) {
+        // Filter featured levels and flatten into allFeaturedLevels
+        allFeaturedLevels.push(
+          ...levels.filter((level) => level.status === "Featured")
+        );
+      }
     }
 
-    // If no levels are found
-    if (allFeaturedLevels.length === 0)
+    // Early return if no levels are found
+    if (allFeaturedLevels.length === 0) {
       return "There are currently no featured levels on LSS matching your query.";
-
-    // Construct response from all levels
-    let responseStr =
-      "__***Currently featured levels on LSS matching your query:***__\n\n\n";
-    for (const featuredLevel of allFeaturedLevels) {
-      responseStr += `[**${featuredLevel.name}**](<https://levelsharesquare.com/levels/${featuredLevel._id}>)\n\n`;
     }
+
+    // Build the response string
+    const responseStr = [
+      "__***Currently featured levels on LSS matching your query:***__\n\n",
+      ...allFeaturedLevels.map(
+        (level) =>
+          `[**${level.name}**](<https://levelsharesquare.com/levels/${level._id}>)\n\n`
+      ),
+    ].join("");
 
     return responseStr;
   } catch (error) {
-    console.error("Error fetching featured levels from LSS:", error);
+    console.error(
+      "Error fetching featured levels from LSS:",
+      error.message || error
+    );
     return "Error fetching featured levels from LSS.";
   }
 }
