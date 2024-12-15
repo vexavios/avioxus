@@ -1,3 +1,4 @@
+import dotenv from "dotenv";
 import express from "express";
 import { InteractionType } from "discord.js";
 import { verifyKeyMiddleware } from "discord-interactions";
@@ -5,6 +6,8 @@ import { getCurrentlyFeaturedLSSLevels, sendDailyPost } from "./helpers.js";
 import { isBotReady } from "./index.js";
 import { Commands } from "./constants.js";
 
+// Setup
+dotenv.config();
 const router = express.Router();
 
 // Generic endpoint currently used for the daily post trigger and app pinging
@@ -46,7 +49,6 @@ router.get("/", async (req, res) => {
 // Discord Slash Command Handler
 router.post(
   "/interactions",
-  // express.raw({ type: "application/json" }),
   verifyKeyMiddleware(process.env.DISCORD_PUBLIC_KEY),
   async (req, res) => {
     const interaction = req.body;

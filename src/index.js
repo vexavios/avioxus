@@ -1,14 +1,12 @@
-import { Client, IntentsBitField } from "discord.js";
 import dotenv from "dotenv";
 import express from "express";
+import { Client, IntentsBitField } from "discord.js";
 import { sendDailyPost } from "./helpers.js";
 import routes from "./endpoints.js";
 
 // Setup
 dotenv.config();
 const app = express();
-// Middleware to parse JSON
-// app.use(express.json());
 // Server routes
 app.use("/", routes);
 
