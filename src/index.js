@@ -43,11 +43,11 @@ client.on("interactionCreate", async (interaction) => {
   const { commandName, options } = interaction;
 
   // Attempt to wake up bot via GET endpoint
-  try {
-    await axios.get(APIs.CLOUD_RUN);
-  } catch (error) {
-    console.error("Error waking up bot:", error.message);
-  }
+  // try {
+  //   await axios.get(APIs.CLOUD_RUN);
+  // } catch (error) {
+  //   console.error("Error waking up bot:", error.message);
+  // }
 
   // Format current timestamp
   const now = new Date();
