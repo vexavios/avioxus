@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "register": "node src/register-commands.js"
   },
   "repository": {
     "type": "git",
@@ -18,7 +19,9 @@
   },
   "homepage": "https://github.com/vexavios/avioxus#readme",
   "dependencies": {
+    "@discordjs/rest": "^2.4.0",
     "axios": "^1.7.9",
+    "discord-api-types": "^0.37.111",
     "discord-interactions": "^4.1.0",
     "discord.js": "^14.16.3",
     "dotenv": "^16.4.7",

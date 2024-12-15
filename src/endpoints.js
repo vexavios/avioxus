@@ -1,15 +1,13 @@
 import express from "express";
-// import {
-//   InteractionType,
-//   InteractionResponseType,
-//   verifyKeyMiddleware,
-// } from "discord-interactions";
+import { InteractionType } from "discord.js";
+import { verifyKeyMiddleware } from "discord-interactions";
 import { sendDailyPost } from "./helpers.js";
 import { isBotReady } from "./index.js";
+import { Commands } from "./constants.js";
 
 const router = express.Router();
 
-// Generic endpoint used for daily post trigger and bot pinging
+// Generic endpoint currently used for the daily post trigger
 router.get("/", async (req, res) => {
   // Check for custom trigger header from Cloud Scheduler
   const trigger = req.get("X-Daily-Post-Trigger");
@@ -41,36 +39,54 @@ router.get("/", async (req, res) => {
   }
   // Default response for non-cron triggers (e.g., from slash command, manual, or other invocations)
   else {
-    console.log("Received a GET request. Waking up the bot...");
     res.status(200).send("Service is online. Awaiting further instructions.");
   }
 });
 
 // Discord Slash Command Handler
-// router.post(
-//   "/interactions",
-//   verifyKeyMiddleware(process.env.DISCORD_PUBLIC_KEY),
-//   (req, res) => {
-//     const interaction = req.body;
+router.post(
+  "/interactions",
+  verifyKeyMiddleware(process.env.DISCORD_PUBLIC_KEY),
+  async (req, res) => {
+    const interaction = req.body;
 
-//     // Handle Slash Command
-//     if (
-//       interaction.type === InteractionType.APPLICATION_COMMAND ||
-//       interaction.type === InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE
-//     ) {
-//       console.log("Received slash command:", interaction.data.name);
+    // Respond to Discord's ping for verification
+    if (interaction.type === InteractionType.Ping) return res.json({ type: 1 });
 
-//       // Respond to the slash command
-//       return res.status(200).json({
-//         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-//         data: {
-//           content: "Hello! The bot is online and ready to respond.",
-//         },
-//       });
-//     }
+    // Handle Slash Command
+    if (interaction.type === InteractionType.ApplicationCommand) {
+      const commandName = interaction.data.name;
 
-//     res.status(400).send("Unhandled interaction type");
-//   }
-// );
+      // Format current timestamp
+      const now = new Date();
+      const nowIsoDate = now.toISOString();
+
+      // Log usage of command
+      console.log(`"/${commandName}" command used at ${nowIsoDate}.`);
+
+      // Handle all commands
+      switch (commandName) {
+        // Standard ping command
+        case Commands.PING:
+          return res.json({
+            type: 4,
+            data: {
+              content: "Pong!",
+            },
+          });
+        // Get featured levels from LSS
+        case Commands.FEATURED.NAME:
+          const game = options.get(Commands.FEATURED.subCommands.GAME)?.value;
+          return res.json({
+            type: 4,
+            data: {
+              content: "Under construction!",
+            },
+          });
+        default:
+      }
+    } else return res.status(400).send("Unknown interaction.");
+  }
+);
 
 export default router;
