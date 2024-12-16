@@ -217,9 +217,11 @@ export async function sendDailyPost() {
     // getWordOfTheDay(),
   ]);
 
-  // Format today's date and current timestamp
+  // Format today's date (in MT) and current timestamp
   const now = new Date();
-  const todayDate = new Intl.DateTimeFormat("en-US").format(now);
+  const todayDate = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Denver",
+  }).format(now);
   const nowIsoDate = now.toISOString();
 
   // Format and send the daily post message
