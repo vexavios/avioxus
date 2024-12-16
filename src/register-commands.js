@@ -21,22 +21,10 @@ const commands = [
         description: "An optional game to filter by.",
         type: ApplicationCommandOptionType.Number,
         choices: [
-          {
-            name: "SMC",
-            value: 0,
-          },
-          {
-            name: "YFS",
-            value: 1,
-          },
-          {
-            name: "SM127",
-            value: 2,
-          },
-          {
-            name: "MB64",
-            value: 4,
-          },
+          { name: "SMC", value: 0 },
+          { name: "YFS", value: 1 },
+          { name: "SM127", value: 2 },
+          { name: "MB64", value: 4 },
         ],
         required: false,
       },
@@ -44,20 +32,17 @@ const commands = [
   },
 ];
 
+// Initialize REST client
 const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
 
-// Register all slash commands
+// Register all slash commands globally
 (async () => {
   try {
     console.log("Registering slash commands...");
 
-    await rest.put(
-      Routes.applicationGuildCommands(
-        process.env.CLIENT_ID,
-        process.env.PERSONAL_HUB_GUILD_ID
-      ),
-      { body: commands }
-    );
+    await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
+      body: commands,
+    });
 
     console.log("Slash commands were registered successfully!");
   } catch (error) {

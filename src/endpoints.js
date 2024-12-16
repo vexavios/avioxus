@@ -40,7 +40,7 @@ router.get("/", async (req, res) => {
       return res.status(500).send("Failed to send daily message.");
     }
   }
-  // Default response for non-cron triggers (e.g., manual, or other invocations)
+  // Default response for non-cron triggers (e.g. manual or other invocations)
   else {
     res.status(200).send("Service is online. Awaiting further instructions.");
   }
