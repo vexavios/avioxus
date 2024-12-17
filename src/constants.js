@@ -12,11 +12,11 @@ export const APIs = {
 // Configs for APIs
 export const Configs = {
   Symbols: {
-    STOCK: ["NVDA", "PLTR", "TSLA", "MSFT", "AAPL", "GOOGL", "V"],
-    CRYPTO: ["bitcoin", "ethereum", "solana", "monero", "dogecoin", "ripple"],
+    STOCK: ["NVDA", "PLTR", "TSLA", "V", "MSTR", "SOFI", "AVGO", "COIN"],
+    CRYPTO: ["bitcoin", "ethereum", "solana", "ripple", "monero", "dogecoin"],
   },
   NEWS_PROPERTIES: [
-    { category: "general", name: "Top Stories" },
+    { category: null, name: "Top Stories" },
     { category: "technology", name: "Technology" },
     { category: "science", name: "Science" },
     { category: "entertainment", name: "Entertainment" },

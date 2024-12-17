@@ -63,7 +63,9 @@ async function getNews() {
     const results = await Promise.all(
       Configs.NEWS_PROPERTIES.map((properties) =>
         axios.get(
-          `${APIs.NEWS}?country=us&category=${properties.category}&apiKey=${process.env.NEWS_API_KEY}`
+          `${APIs.NEWS}?country=us${
+            properties.category !== null && `&category=${properties.category}`
+          }&apiKey=${process.env.NEWS_API_KEY}`
         )
       )
     );
