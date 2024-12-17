@@ -14,7 +14,7 @@ const commands = [
   },
   {
     name: Commands.FEATURED.NAME,
-    description: "Gets all current featured levels from LSS.",
+    description: "Gets all currently featured levels from LSS.",
     options: [
       {
         name: Commands.FEATURED.subCommands.GAME,
