@@ -60,9 +60,8 @@ router.post(
     // Respond to Discord's ping for verification
     if (interaction.type === InteractionType.Ping)
       return res.json({ type: InteractionResponseType.Pong });
-
     // Handle Slash Commands
-    if (interaction.type === InteractionType.ApplicationCommand) {
+    else if (interaction.type === InteractionType.ApplicationCommand) {
       // Extract command and any subcommand(s)
       const commandName = interaction.data.name;
       const options = interaction.data.options || [];
