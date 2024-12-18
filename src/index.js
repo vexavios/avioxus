@@ -1,8 +1,8 @@
 import dotenv from "dotenv";
 import express from "express";
 import { Client, IntentsBitField } from "discord.js";
-import { sendDailyPost } from "./helpers.js";
 import routes from "./endpoints.js";
+import { sendDailyPost } from "./helpers.js";
 
 // Setup
 dotenv.config();
@@ -29,7 +29,7 @@ client.on("ready", async () => {
   isBotReady = true;
 
   // LOCAL TESTING ONLY: Send daily post in channel if property is true
-  // if (process.env.TRIGGER_DAILY_POST === "true") await sendDailyPost();
+  if (process.env.TRIGGER_DAILY_POST === "true") await sendDailyPost();
 });
 
 // Login bot to Discord

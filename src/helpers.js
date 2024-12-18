@@ -1,6 +1,7 @@
 import axios from "axios";
+import { InteractionResponseType } from "discord.js";
 import { client } from "./index.js";
-import { APIs, Configs } from "./constants.js";
+import { APIs, Configs, Properties } from "./constants.js";
 
 /* ----------- Helper Functions ----------- */
 
@@ -133,6 +134,18 @@ async function getWordOfTheDay() {
   }
 }
 
+// Get an LSS game name from a specified ID
+function getLSSGameNameFromId(game) {
+  const gameMap = {
+    0: "Super Mario Construct",
+    1: "Yoshi's Fabrication Station",
+    2: "Super Mario 127",
+    4: "Mario Builder 64",
+  };
+
+  return gameMap[game] || null; // Return `null` if the game ID is not found
+}
+
 // Get currently featured levels from LSS (with optional game to filter by)
 export async function getCurrentlyFeaturedLSSLevels(game) {
   try {
@@ -163,12 +176,17 @@ export async function getCurrentlyFeaturedLSSLevels(game) {
       return "There are currently no featured levels on LSS matching your query.";
     }
 
+    // If game is specified in command, get game name
+    const singleGameName = game !== -1 ? getLSSGameNameFromId(game) : null;
+
     // Build the response string
     const responseStr = [
       "__***Currently featured levels on LSS matching your query:***__\n\n",
       ...allFeaturedLevels.map(
         (level) =>
-          `[**${level.name}**](<https://levelsharesquare.com/levels/${level._id}>)\n\n`
+          `- [**${level.name}**](<https://levelsharesquare.com/levels/${
+            level._id
+          }>) *(${singleGameName ?? getLSSGameNameFromId(level.game)})*\n`
       ),
     ].join("");
 
@@ -183,17 +201,17 @@ export async function getCurrentlyFeaturedLSSLevels(game) {
 }
 
 // Split message into multiple parts if it exceeds the Discord character limit
-function splitMessage(text) {
+export function splitMessage(text) {
   const result = [];
-  const maxLength = 2000;
+  const maxLength = Properties.DISCORD_CHAR_LIMIT;
 
   while (text.length > 0) {
     let chunk = text.slice(0, maxLength);
-    const lastNewsHeadlineStart = chunk.lastIndexOf("- [");
+    const lastLinkStart = chunk.lastIndexOf("- [");
 
-    // Avoid cutting in the middle of a news headline
-    if (lastNewsHeadlineStart > -1 && chunk.length === maxLength) {
-      chunk = chunk.slice(0, lastNewsHeadlineStart);
+    // Avoid cutting in the middle of a link
+    if (lastLinkStart > -1 && chunk.length === maxLength) {
+      chunk = chunk.slice(0, lastLinkStart);
     }
 
     result.push(chunk.trim());
@@ -201,6 +219,51 @@ function splitMessage(text) {
   }
 
   return result;
+}
+
+// Send full slash command response, potentially in chunks (depending on length)
+export async function sendSlashCommandResponse(req, res, responseStr) {
+  try {
+    // If message is over the Discord character limit
+    const overCharLimit = responseStr.length > Properties.DISCORD_CHAR_LIMIT;
+
+    // Break up the message if it's over the Discord character limit
+    const responseChunks = overCharLimit
+      ? splitMessage(responseStr)
+      : responseStr;
+
+    // Send the (potentially) first chunk as the initial response
+    res.json({
+      type: InteractionResponseType.ChannelMessageWithSource,
+      data: {
+        content: overCharLimit ? responseChunks[0] : responseChunks,
+      },
+    });
+
+    // Send additional messages if the response is over the Discord character limit
+    if (overCharLimit) {
+      // For additional chunks, use the follow-up webhook
+      const followUpUrl = req.body.token
+        ? `${APIs.DISCORD}/v10/webhooks/${req.body.application_id}/${req.body.token}`
+        : null;
+
+      // Send any additional response chunks
+      if (followUpUrl) {
+        for (let i = 1; i < responseChunks.length; i++) {
+          await axios.post(
+            followUpUrl,
+            { content: responseChunks[i] },
+            {
+              headers: { "Content-Type": "application/json" },
+            }
+          );
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Error handling slash command:", error);
+    return res.status(500).send({ error: "Something went wrong." });
+  }
 }
 
 // Construct and send daily post in chosen channel
@@ -239,11 +302,16 @@ export async function sendDailyPost() {
     "__**Word of the Day:**__\n" + word,
   ].join("\n\n");
 
-  // Attempt to break up the message if it's over the Discord character limit
-  const messageChunks = splitMessage(message);
+  // If message is over the Discord character limit
+  const overCharLimit = message.length > Properties.DISCORD_CHAR_LIMIT;
 
-  // Send message in chunks
-  for (const chunk of messageChunks) await channel.send(chunk);
+  // Break up the message if it's over the Discord character limit
+  const messageChunks = overCharLimit ? splitMessage(message) : message;
+
+  // Send full message
+  if (overCharLimit)
+    for (const chunk of messageChunks) await channel.send(chunk);
+  else await channel.send(messageChunks);
 
   // Log sending of post
   console.log(`Daily post sent for ${todayDate} at ${nowIsoDate}.`);

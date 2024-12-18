@@ -1,8 +1,12 @@
 import dotenv from "dotenv";
 import express from "express";
-import { InteractionType } from "discord.js";
+import { InteractionType, InteractionResponseType } from "discord.js";
 import { verifyKeyMiddleware } from "discord-interactions";
-import { getCurrentlyFeaturedLSSLevels, sendDailyPost } from "./helpers.js";
+import {
+  getCurrentlyFeaturedLSSLevels,
+  sendDailyPost,
+  sendSlashCommandResponse,
+} from "./helpers.js";
 import { isBotReady } from "./index.js";
 import { Commands } from "./constants.js";
 
@@ -19,7 +23,7 @@ router.get("/", async (req, res) => {
   if (trigger === "true") {
     console.log("Triggered by Cloud Scheduler. Sending daily post...");
 
-    const TIMEOUT = 10000; // 10 seconds timeout
+    const TIMEOUT = 20000; // 20 seconds timeout
     const startTime = Date.now();
 
     // Wait for bot readiness
@@ -54,7 +58,8 @@ router.post(
     const interaction = req.body;
 
     // Respond to Discord's ping for verification
-    if (interaction.type === InteractionType.Ping) return res.json({ type: 1 });
+    if (interaction.type === InteractionType.Ping)
+      return res.json({ type: InteractionResponseType.Pong });
 
     // Handle Slash Commands
     if (interaction.type === InteractionType.ApplicationCommand) {
@@ -74,7 +79,7 @@ router.post(
         // Standard ping command
         case Commands.PING:
           return res.json({
-            type: 4,
+            type: InteractionResponseType.ChannelMessageWithSource,
             data: {
               content: "Pong!",
             },
@@ -88,12 +93,9 @@ router.post(
           // Get all levels
           const responseStr = await getCurrentlyFeaturedLSSLevels(game ?? -1);
 
-          return res.json({
-            type: 4,
-            data: {
-              content: responseStr,
-            },
-          });
+          // Send full response
+          await sendSlashCommandResponse(req, res, responseStr);
+          break;
         default:
       }
     } else return res.status(400).send("Unknown interaction.");

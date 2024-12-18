@@ -7,6 +7,7 @@ export const APIs = {
   FUN_FACT: "https://uselessfacts.jsph.pl/api/v2/facts/today",
   WORD: "https://api.wordnik.com/v4/words.json/wordOfTheDay",
   LSS: "https://levelsharesquare.com/api",
+  DISCORD: "https://discord.com/api",
 };
 
 // Configs for APIs
@@ -35,4 +36,9 @@ export const Commands = {
     NAME: "featured",
     subCommands: { GAME: "game" },
   },
+};
+
+// Various properties to be referenced
+export const Properties = {
+  DISCORD_CHAR_LIMIT: 2000,
 };
