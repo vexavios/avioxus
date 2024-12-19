@@ -150,7 +150,7 @@ function getLSSGameNameFromId(game) {
 export async function getCurrentlyFeaturedLSSLevels(game) {
   try {
     const allFeaturedLevels = [];
-    const maxPages = 2;
+    const maxPages = 3;
 
     // Loop through pages to fetch levels
     for (let currentPage = 1; currentPage <= maxPages; currentPage++) {
