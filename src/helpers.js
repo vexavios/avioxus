@@ -127,7 +127,9 @@ async function getWordOfTheDay() {
     const { word, definitions } = response.data;
 
     // Format and return data
-    return `Word of the Day: ${word} *(${definitions[0].partOfSpeech})* - ${definitions[0].text}`;
+    return `${word.charAt(0).toUpperCase() + word.slice(1)} *(${
+      definitions[0].partOfSpeech
+    })*: ${definitions[0].text}`;
   } catch (error) {
     console.error("Error fetching word of the day:", error);
     return "Error fetching word of the day.";
