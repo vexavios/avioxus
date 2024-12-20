@@ -23,7 +23,7 @@ router.get("/", async (req, res) => {
   if (trigger === "true") {
     console.log("Triggered by Cloud Scheduler. Sending daily post...");
 
-    const TIMEOUT = 20000; // 20 seconds timeout
+    const TIMEOUT = 30000; // 30 seconds timeout
     const startTime = Date.now();
 
     // Wait for bot readiness
