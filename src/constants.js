@@ -14,7 +14,15 @@ export const APIs = {
 export const Configs = {
   Symbols: {
     STOCK: ["NVDA", "PLTR", "TSLA", "V", "MSTR", "SOFI", "AVGO", "COIN"],
-    CRYPTO: ["bitcoin", "ethereum", "solana", "ripple", "monero", "dogecoin"],
+    CRYPTO: [
+      "bitcoin",
+      "ethereum",
+      "solana",
+      "ripple",
+      "monero",
+      "kaspa",
+      "dogecoin",
+    ],
   },
   NEWS_PROPERTIES: [
     { category: null, name: "Top Stories" },
