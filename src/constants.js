@@ -1,6 +1,6 @@
 // API links
 export const APIs = {
-  STOCK: "https://api.twelvedata.com/time_series",
+  STOCK: "https://api.twelvedata.com",
   CRYPTO: "https://api.coingecko.com/api/v3/simple/price",
   NEWS: "https://newsapi.org/v2/top-headlines",
   WEATHER: "https://api.openweathermap.org/data/2.5/weather",

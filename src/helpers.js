@@ -3,14 +3,35 @@ import { InteractionResponseType } from "discord.js";
 import { client } from "./index.js";
 import { APIs, Configs, Properties } from "./constants.js";
 
-/* ----------- Helper Functions ----------- */
+/* ----------- Helper Functions/Properties ----------- */
 
-// Get chosen opening stock prices from API
-async function getStockPrices() {
+// Global variable to store stock market status
+let isStockMarketOpen = false;
+
+// Check if the stock market is open
+async function setStockMarketOpen() {
   try {
     // API call
     const response = await axios.get(
-      `${APIs.STOCK}?symbol=${Configs.Symbols.STOCK.join(
+      `${APIs.STOCK}/market_state?apikey=${process.env.STOCK_API_KEY}`
+    );
+
+    // Set global variable to market status
+    isStockMarketOpen = response.data[0][0].is_market_open;
+  } catch (error) {
+    console.error("Error checking stock market status:", error);
+  }
+}
+
+// Get chosen opening/closing stock prices from API
+async function getStockPrices() {
+  try {
+    // Check if stock market is open
+    await setStockMarketOpen();
+
+    // API call
+    const response = await axios.get(
+      `${APIs.STOCK}/time_series?symbol=${Configs.Symbols.STOCK.join(
         ","
       )}&interval=1day&apikey=${process.env.STOCK_API_KEY}`
     );
@@ -19,7 +40,9 @@ async function getStockPrices() {
     return Configs.Symbols.STOCK.map(
       (stock) =>
         `${stock}: $${parseInt(
-          response.data[stock].values[0].open
+          isStockMarketOpen
+            ? response.data[stock].values[0].open
+            : response.data[stock].values[0].close
         ).toLocaleString("en-US", {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
@@ -57,7 +80,7 @@ async function getCryptoPrices() {
   }
 }
 
-// Get latest news from chosen categories from API
+// Get latest US news from chosen categories from API
 async function getNews() {
   try {
     // API call
@@ -296,7 +319,9 @@ export async function sendDailyPost() {
   // Format and send the daily post message
   const message = [
     `__***Daily Post for ${todayDate}:***__`,
-    "__**Stock Prices:**__\n" + stocks.join("\n"),
+    `__**${
+      isStockMarketOpen ? "Today's Opening" : "Last Market Day's Closing"
+    } Stock Prices:**__\n` + stocks.join("\n"),
     "__**Crypto Prices:**__\n" + crypto.join("\n"),
     "__**News Headlines:**__\n" + news.join("\n"),
     "__**Weather:**__\n" + weather,
