@@ -13,7 +13,7 @@ export const APIs = {
 // Configs for APIs
 export const Configs = {
   Symbols: {
-    STOCK: ["NVDA", "PLTR", "TSLA", "V", "MSTR", "SOFI", "AVGO", "COIN"],
+    STOCK: ["NVDA", "PLTR", "TSLA", "V", "MSTR", "SOFI", "AVGO"],
     CRYPTO: [
       "bitcoin",
       "ethereum",

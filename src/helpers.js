@@ -16,10 +16,8 @@ async function setStockMarketOpen() {
       `${APIs.STOCK}/market_state?apikey=${process.env.STOCK_API_KEY}`
     );
 
-    console.log(response);
-
     // Set global variable to market status
-    isStockMarketOpen = response.data[0][0].is_market_open;
+    isStockMarketOpen = response.data[0].is_market_open;
   } catch (error) {
     console.error("Error checking stock market status:", error);
   }
@@ -37,8 +35,6 @@ async function getStockPrices() {
         ","
       )}&interval=1day&apikey=${process.env.STOCK_API_KEY}`
     );
-
-    console.log(response);
 
     // Format and return data
     return Configs.Symbols.STOCK.map(
