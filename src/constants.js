@@ -31,9 +31,9 @@ export const Configs = {
     { category: "entertainment", name: "Entertainment" },
   ],
   Weather: {
-    LATITUDE: 39.5481,
-    LONGITUDE: -104.9739,
-    CITY: "Highlands Ranch",
+    LATITUDE: process.env.WEATHER_LATITUDE,
+    LONGITUDE: process.env.WEATHER_LONGITUDE,
+    CITY: process.env.WEATHER_CITY,
   },
 };
 

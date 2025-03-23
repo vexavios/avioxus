@@ -24,6 +24,9 @@ steps:
         NEWS_API_KEY=$(gcloud secrets versions access latest --secret="NEWS_API_KEY")
         WEATHER_API_KEY=$(gcloud secrets versions access latest --secret="WEATHER_API_KEY")
         WORD_API_KEY=$(gcloud secrets versions access latest --secret="WORD_API_KEY")
+        WEATHER_LATITUDE=$(gcloud secrets versions access latest --secret="WEATHER_LATITUDE")
+        WEATHER_LONGITUDE=$(gcloud secrets versions access latest --secret="WEATHER_LONGITUDE")
+        WEATHER_CITY=$(gcloud secrets versions access latest --secret="WEATHER_CITY")
 
         # Deploy the service to Cloud Run with the secrets as environment variables
         gcloud run deploy avioxus-bot \
@@ -32,7 +35,7 @@ steps:
           --service-account avioxus-service-account@avioxus.iam.gserviceaccount.com \
           --platform managed \
           --allow-unauthenticated \
-          --set-env-vars DISCORD_TOKEN=$$DISCORD_TOKEN,DISCORD_PUBLIC_KEY=$$DISCORD_PUBLIC_KEY,CLIENT_ID=$$CLIENT_ID,PERSONAL_HUB_GUILD_ID=$$PERSONAL_HUB_GUILD_ID,DAILY_POSTS_CHANNEL_ID=$$DAILY_POSTS_CHANNEL_ID,STOCK_API_KEY=$$STOCK_API_KEY,CRYPTO_API_KEY=$$CRYPTO_API_KEY,NEWS_API_KEY=$$NEWS_API_KEY,WEATHER_API_KEY=$$WEATHER_API_KEY,WORD_API_KEY=$$WORD_API_KEY
+          --set-env-vars DISCORD_TOKEN=$$DISCORD_TOKEN,DISCORD_PUBLIC_KEY=$$DISCORD_PUBLIC_KEY,CLIENT_ID=$$CLIENT_ID,PERSONAL_HUB_GUILD_ID=$$PERSONAL_HUB_GUILD_ID,DAILY_POSTS_CHANNEL_ID=$$DAILY_POSTS_CHANNEL_ID,STOCK_API_KEY=$$STOCK_API_KEY,CRYPTO_API_KEY=$$CRYPTO_API_KEY,NEWS_API_KEY=$$NEWS_API_KEY,WEATHER_API_KEY=$$WEATHER_API_KEY,WORD_API_KEY=$$WORD_API_KEY,WEATHER_LATITUDE=$$WEATHER_LATITUDE,WEATHER_LONGITUDE=$$WEATHER_LONGITUDE,WEATHER_CITY=$$WEATHER_CITY
 
 # Define substitutions (optional, useful for dynamic builds)
 substitutions:
