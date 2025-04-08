@@ -1,9 +1,9 @@
 steps:
   # Step 1: Build the Docker image
   - name: "gcr.io/cloud-builders/docker"
-    args: ["build", "-t", "gcr.io/avioxus/avioxus-bot", "."]
+    args: ["build", "--no-cache", "-t", "gcr.io/avioxus/avioxus-bot", "."]
 
-  # Step 2: Push the Docker image to Container Registry
+  # Step 2: Push the Docker image to Artifact Registry
   - name: "gcr.io/cloud-builders/docker"
     args: ["push", "gcr.io/avioxus/avioxus-bot"]
 
@@ -30,7 +30,7 @@ steps:
 
         # Deploy the service to Cloud Run with the secrets as environment variables
         gcloud run deploy avioxus-bot \
-          --image gcr.io/avioxus/avioxus-bot \
+          --image gcr.io/avioxus/avioxus-bot:latest \
           --region us-central1 \
           --service-account avioxus-service-account@avioxus.iam.gserviceaccount.com \
           --platform managed \
