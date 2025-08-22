@@ -1,15 +1,59 @@
+import dotenv from "dotenv";
 import axios from "axios";
-import { InteractionResponseType } from "discord.js";
-import { client } from "./index.js";
-import { APIs, Configs, Properties } from "./constants.js";
+import { BaseGuildTextChannel } from "discord.js";
+import { client } from "./index";
+import { APIs, Configs, GameMap } from "./constants";
 
-/* ----------- Helper Functions/Properties ----------- */
+dotenv.config();
 
 // Global variable to store stock market status
 let isStockMarketOpen = false;
 
+interface StockResponse {
+  [key: string]: {
+    values: Array<{
+      open: string;
+      close: string;
+    }>;
+  };
+}
+
+interface CryptoResponse {
+  [key: string]: {
+    usd: number;
+  };
+}
+
+interface WeatherResponse {
+  main: {
+    temp: number;
+  };
+  weather: Array<{
+    description: string;
+  }>;
+}
+
+interface NewsArticle {
+  title: string;
+  url: string;
+}
+
+interface WordResponse {
+  word: string;
+  definitions: Array<{
+    partOfSpeech: string;
+    text: string;
+  }>;
+}
+
+interface LSSLevel {
+  _id: string;
+  name: string;
+  game: number;
+}
+
 // Check if the stock market is open
-async function setStockMarketOpen() {
+async function setStockMarketOpen(): Promise<void> {
   try {
     // API call
     const response = await axios.get(
@@ -24,13 +68,13 @@ async function setStockMarketOpen() {
 }
 
 // Get chosen opening/closing stock prices from API
-async function getStockPrices() {
+async function getStockPrices(): Promise<string[]> {
   try {
     // Check if stock market is open
     await setStockMarketOpen();
 
     // API call
-    const response = await axios.get(
+    const response = await axios.get<StockResponse>(
       `${APIs.STOCK}/time_series?symbol=${Configs.Symbols.STOCK.join(
         ","
       )}&interval=1day&apikey=${process.env.STOCK_API_KEY}`
@@ -55,10 +99,10 @@ async function getStockPrices() {
 }
 
 // Get chosen crypto prices from API
-async function getCryptoPrices() {
+async function getCryptoPrices(): Promise<string[]> {
   try {
     // API call
-    const response = await axios.get(
+    const response = await axios.get<CryptoResponse>(
       `${APIs.CRYPTO}?ids=${Configs.Symbols.CRYPTO.join(
         ","
       )}&vs_currencies=usd&x_cg_demo_api_key=${process.env.CRYPTO_API_KEY}`
@@ -81,12 +125,12 @@ async function getCryptoPrices() {
 }
 
 // Get latest US news from chosen categories from API
-async function getNews() {
+async function getNews(): Promise<string[]> {
   try {
     // API call
     const results = await Promise.all(
       Configs.NEWS_PROPERTIES.map((properties) =>
-        axios.get(
+        axios.get<{ articles: NewsArticle[] }>(
           `${APIs.NEWS}?country=us${
             properties.category !== null
               ? `&category=${properties.category}`
@@ -98,10 +142,9 @@ async function getNews() {
 
     // Format and return data
     return results.map((res, index) => {
-      // Only keep the first three articles from each category
+      const { name } = Configs.NEWS_PROPERTIES[index];
       const articles = res.data.articles.slice(0, 3);
-
-      return `${Configs.NEWS_PROPERTIES[index].name}:\n${articles
+      return `**${name}:**\n${articles
         .map((article) => `- [${article.title}](<${article.url}>)`)
         .join("\n")}`;
     });
@@ -112,10 +155,10 @@ async function getNews() {
 }
 
 // Get weather at chosen location from API
-async function getWeather() {
+async function getWeather(): Promise<string> {
   try {
     // API call
-    const response = await axios.get(
+    const response = await axios.get<WeatherResponse>(
       `${APIs.WEATHER}?lat=${Configs.Weather.LATITUDE}&lon=${Configs.Weather.LONGITUDE}&units=imperial&appid=${process.env.WEATHER_API_KEY}`
     );
     const { main, weather } = response.data;
@@ -129,10 +172,10 @@ async function getWeather() {
 }
 
 // Get fun fact of the day from API
-async function getFunFact() {
+async function getFunFact(): Promise<string> {
   try {
     // API call
-    const response = await axios.get(APIs.FUN_FACT);
+    const response = await axios.get<{ text: string }>(APIs.FUN_FACT);
     return response.data.text;
   } catch (error) {
     console.error("Error fetching fun fact:", error);
@@ -141,10 +184,10 @@ async function getFunFact() {
 }
 
 // Get word of the day from API
-async function getWordOfTheDay() {
+async function getWordOfTheDay(): Promise<string> {
   try {
     // API call
-    const response = await axios.get(
+    const response = await axios.get<WordResponse>(
       `${APIs.WORD}?api_key=${process.env.WORD_API_KEY}`
     );
     const { word, definitions } = response.data;
@@ -160,8 +203,8 @@ async function getWordOfTheDay() {
 }
 
 // Get an LSS game name from a specified ID
-function getLSSGameNameFromId(game) {
-  const gameMap = {
+function getLSSGameNameFromId(game: number): string | null {
+  const gameMap: GameMap = {
     0: "Super Mario Construct",
     1: "Yoshi's Fabrication Station",
     2: "Super Mario 127",
@@ -172,33 +215,34 @@ function getLSSGameNameFromId(game) {
 }
 
 // Get currently featured levels from LSS (with optional game to filter by)
-export async function getCurrentlyFeaturedLSSLevels(game) {
+export async function getCurrentlyFeaturedLSSLevels(
+  game: number
+): Promise<string> {
   try {
-    const allFeaturedLevels = [];
+    const allFeaturedLevels: LSSLevel[] = [];
     const maxPages = 3;
 
     // Loop through pages to fetch levels
     for (let currentPage = 1; currentPage <= maxPages; currentPage++) {
-      const query =
+      const response = await axios.get<{ levels: LSSLevel[] }>(
+        `${APIs.LSS}/levels/featured?page=${currentPage}`
+      );
+
+      // Exit loop if no more levels are found
+      if (!response.data.levels || response.data.levels.length === 0) break;
+
+      // Filter levels by game if specified
+      const levels =
         game !== -1
-          ? `?page=${currentPage}&game=${game}`
-          : `?page=${currentPage}`;
-      const url = `${APIs.LSS}/levels/featured/get${query}`;
+          ? response.data.levels.filter((level) => level.game === game)
+          : response.data.levels;
 
-      const response = await axios.get(url);
-      const { levels } = response.data;
-
-      if (levels) {
-        // Filter featured levels and flatten into allFeaturedLevels
-        allFeaturedLevels.push(
-          ...levels.filter((level) => level.status === "Featured")
-        );
-      }
+      allFeaturedLevels.push(...levels);
     }
 
     // Early return if no levels are found
     if (allFeaturedLevels.length === 0) {
-      return "There are currently no featured levels on LSS matching your query.";
+      return "No featured levels found matching your query.";
     }
 
     // If game is specified in command, get game name
@@ -219,16 +263,16 @@ export async function getCurrentlyFeaturedLSSLevels(game) {
   } catch (error) {
     console.error(
       "Error fetching featured levels from LSS:",
-      error.message || error
+      error instanceof Error ? error.message : error
     );
     return "Error fetching featured levels from LSS.";
   }
 }
 
 // Split message into multiple parts if it exceeds the Discord character limit
-export function splitMessage(text) {
-  const result = [];
-  const maxLength = Properties.DISCORD_CHAR_LIMIT;
+export function splitMessage(text: string): string[] {
+  const result: string[] = [];
+  const maxLength = 2000; // Discord character limit
 
   while (text.length > 0) {
     let chunk = text.slice(0, maxLength);
@@ -246,58 +290,28 @@ export function splitMessage(text) {
   return result;
 }
 
-// Send full slash command response, potentially in chunks (depending on length)
-export async function sendSlashCommandResponse(req, res, responseStr) {
-  try {
-    // If message is over the Discord character limit
-    const overCharLimit = responseStr.length > Properties.DISCORD_CHAR_LIMIT;
-
-    // Break up the message if it's over the Discord character limit
-    const responseChunks = overCharLimit
-      ? splitMessage(responseStr)
-      : responseStr;
-
-    // Send the (potentially) first chunk as the initial response
-    res.json({
-      type: InteractionResponseType.ChannelMessageWithSource,
-      data: {
-        content: overCharLimit ? responseChunks[0] : responseChunks,
-      },
-    });
-
-    // Send additional messages if the response is over the Discord character limit
-    if (overCharLimit) {
-      // For additional chunks, use the follow-up webhook
-      const followUpUrl = req.body.token
-        ? `${APIs.DISCORD}/v10/webhooks/${req.body.application_id}/${req.body.token}`
-        : null;
-
-      // Send any additional response chunks
-      if (followUpUrl) {
-        for (let i = 1; i < responseChunks.length; i++) {
-          await axios.post(
-            followUpUrl,
-            { content: responseChunks[i] },
-            {
-              headers: { "Content-Type": "application/json" },
-            }
-          );
-        }
-      }
-    }
-  } catch (error) {
-    console.error("Error handling slash command:", error);
-    return res.status(500).send({ error: "Something went wrong." });
-  }
-}
-
 // Construct and send daily post in chosen channel
-export async function sendDailyPost() {
-  // Get chosen channel
-  const channel = await client.channels.fetch(
-    process.env.DAILY_POSTS_CHANNEL_ID
-  );
-  if (!channel) return;
+export async function sendDailyPost(): Promise<void> {
+  // Check environment variable
+  const channelId = process.env.DAILY_POSTS_CHANNEL_ID;
+  if (!channelId) {
+    console.error("Missing DAILY_POSTS_CHANNEL_ID environment variable");
+    return;
+  }
+
+  // Get chosen channel and ensure it's text-based
+  const channel = await client.channels.fetch(channelId);
+
+  // Type guard to ensure channel is text-based
+  if (!channel || !("send" in channel) || typeof channel.send !== "function") {
+    console.error(
+      "Could not find daily posts channel or channel does not support sending messages."
+    );
+    return;
+  }
+
+  // Cast channel to BaseGuildTextChannel type
+  const textChannel = channel as BaseGuildTextChannel;
 
   // Get all data
   const [stocks, crypto, news, weather, funFact, word] = await Promise.all([
@@ -330,15 +344,12 @@ export async function sendDailyPost() {
   ].join("\n\n");
 
   // If message is over the Discord character limit
-  const overCharLimit = message.length > Properties.DISCORD_CHAR_LIMIT;
-
-  // Break up the message if it's over the Discord character limit
-  const messageChunks = overCharLimit ? splitMessage(message) : message;
+  const messageChunks = splitMessage(message);
 
   // Send full message
-  if (overCharLimit)
-    for (const chunk of messageChunks) await channel.send(chunk);
-  else await channel.send(messageChunks);
+  for (const chunk of messageChunks) {
+    await textChannel.send({ content: chunk });
+  }
 
   // Log sending of post
   console.log(`Daily post sent for ${todayDate} at ${nowIsoDate}.`);
