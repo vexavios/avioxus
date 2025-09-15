@@ -332,15 +332,15 @@ export async function sendDailyPost(): Promise<void> {
 
   // Format and send the daily post message
   const message = [
-    `__***Daily Post for ${todayDate}:***__`,
-    `__**${
+    `# Daily Post for ${todayDate}:`,
+    `## ${
       isStockMarketOpen ? "Today's Opening" : "Last Market Day's Closing"
-    } Stock Prices:**__\n` + stocks.join("\n"),
-    "__**Crypto Prices:**__\n" + crypto.join("\n"),
-    "__**News Headlines:**__\n" + news.join("\n"),
-    "__**Weather:**__\n" + weather,
-    "__**Fun Fact:**__\n" + funFact,
-    "__**Word of the Day:**__\n" + word,
+    } Stock Prices:\n` + stocks.join("\n"),
+    "## Crypto Prices:\n" + crypto.join("\n"),
+    "## News Headlines:\n" + news.join("\n"),
+    "## Weather:\n" + weather,
+    "## Fun Fact:\n" + funFact,
+    "## Word of the Day:\n" + word,
   ].join("\n\n");
 
   // If message is over the Discord character limit
